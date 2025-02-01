@@ -19,6 +19,7 @@ public class SecurityConfig{
             .requestMatchers("/manager").hasAnyRole("ADMIN", "MANAGER") //ADMIN또는 MANAGER가 접근
             .requestMatchers("/admin").hasRole("ADMIN") //ADMIN만 접근
             .anyRequest().permitAll()); //그 외 모든 요청은 허용
+            //.anyRequest().authenticated()); 모든 요청에 대해 인증(로그인) 필요
 
         return http.build();
     }
