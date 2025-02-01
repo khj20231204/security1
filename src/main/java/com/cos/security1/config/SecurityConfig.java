@@ -22,7 +22,7 @@ public class SecurityConfig{
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests((authorizeRequests) -> authorizeRequests
-            .requestMatchers("/user/**").authenticated() //user는 인증된 사용자만 접근
+            .requestMatchers("/user/**").authenticated() //user는 로그인하면 접근 가능, 인증되면이란? => 로그인
             .requestMatchers("/manager").hasAnyRole("ADMIN", "MANAGER") //ADMIN또는 MANAGER가 접근
             .requestMatchers("/admin").hasRole("ADMIN") //ADMIN만 접근
             .anyRequest().permitAll() //그 외 모든 요청은 허용
