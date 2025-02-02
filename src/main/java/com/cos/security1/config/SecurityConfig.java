@@ -2,6 +2,8 @@ package com.cos.security1.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -9,6 +11,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration //자바가 인식하는 설정 클래스로 지정
 @EnableWebSecurity //스프링 시큐리티 필터가 스프링 필터체인에 등록이 됨
+@EnableMethodSecurity(securedEnabled = true) //Role기반 보안적용
 public class SecurityConfig{
 
     //해당 메서드의 리턴되는 오브젝트를 IoC로 등록해준다.
@@ -25,6 +28,9 @@ public class SecurityConfig{
             .requestMatchers("/user/**").authenticated() //user는 로그인하면 접근 가능, 인증되면이란? => 로그인
             .requestMatchers("/manager").hasAnyRole("ADMIN", "MANAGER") //ADMIN또는 MANAGER가 접근
             .requestMatchers("/admin").hasRole("ADMIN") //ADMIN만 접근
+            /*
+            ➡️ .hasAnyRole("ADMIN", "MANAGER")과 hasRole("ADMIN")은 내부적으로 "ROLE_"를 자동으로 붙임
+            */
             .anyRequest().permitAll() //그 외 모든 요청은 허용
             )
             .formLogin(login -> login

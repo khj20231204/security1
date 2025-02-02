@@ -1,13 +1,14 @@
 package com.cos.security1.config.auth;
 
-import com.cos.security1.model.User;
 import com.cos.security1.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authorization.method.AuthorizeReturnObject;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.management.loading.PrivateClassLoader;
@@ -40,13 +41,28 @@ public class PrincipalDetailsService implements UserDetailsService {
     /* 로그인 버튼을 클릭하면 IoC에서 UserDetailsService를 찾는다.
     이후 UserDetails를 찾고 username파라미터를 가져온다 */
 
-        User userEntity = userRepository.findByUsername(username);
+        if (username.equals("admin")) {
+            return org.springframework.security.core.userdetails.User.withUsername("adminUser")
+                    .password(new BCryptPasswordEncoder().encode("password"))  // 패스워드는 평문(no-op 인코딩)
+                    .roles("ADMIN") // "ROLE_ADMIN"으로 변환됨
+                    .build();
+        } else if (username.equals("manager")) {
+            return org.springframework.security.core.userdetails.User.withUsername("managerUser")
+                    .password(new BCryptPasswordEncoder().encode("password"))  // 패스워드는 평문(no-op 인코딩)
+                    .roles("MANAGER") // "ROLE_MANAGER"로 변환됨
+                    .build();
+        } else {
+            throw new UsernameNotFoundException("User not found");
+        }
+
+        /*
+        com.cos.security1.model.User userEntity = userRepository.findByUsername(username);
 
         if(userEntity != null) {
             return new PrincipalDetails(userEntity);
             //return이 되면 UserDetails가 Authentication에 들어가고, 다시 Security Session에 들어간다
             // Seucrity Session(내부 Authentication(내부 UserDetails))
         }
-        return null;
+        return null;*/
     }
 }
