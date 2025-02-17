@@ -1,71 +1,66 @@
 package com.cos.security1.config.auth;
 
-import com.cos.security1.model.User;
+import java.util.Collection;
+import java.util.List;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import com.cos.security1.model.User;
 
 /*
-시큐리티가 /login 주소 요청이 오면 낚아채서 로그인을 진행
-로그인 진행이 완료가 되면 시큐리티 session을 만들어서 넣어준다.(Security ContextHolder 여기에 session 정보를 저장)
-Security ContextHolder에 들어갈 수 있는 오브젝트는 정해져있다.
-오브젝트 => Authentication 타입 객체
-Authentication 안에 User 정보가 있어야 함
+클라이언트가 로그인을 해서 요청이 오면 SecurityConfig에서 /login을 주소를 낚아채서 진행을 시키는데
+로그인 진행이 완료되면 시큐리티가 자신의 session을 만들어서 넣어준다. 
+세션 이름은 Security ContextHolder 이다
+Security ContextHolder에 들어갈 수 있는 세션이 정해져있는데 그건 Authentication 타입 객체이다
+Authentication 안에 User 정보가 있어야 된다.   
 User 오브젝트 타입 => UserDetails 타입 객체
 
-Security Session 안에 => Authenctication 안에 => UserDetails 안에 User 정보가 있다
-이렇게 만들어놨다
+Security Session -> Authentication -> UserDetails(PrincipalDetails)
 */
-public class PrincipalDetails implements UserDetails {
+public class PrincipalDetails implements UserDetails{
 
-    private User user;
+   private User user;
 
-    public PrincipalDetails(User user) {
-        this.user = user;
-    }
+   public PrincipalDetails(User user){
+      this.user = user;
+   }
 
-    //해당 User의 권한을 리턴하는 곳
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
+   //해당 User의 권한을 리턴하는 곳
+   //밑에는 예전 버전
+   /*
+   @Override
+   public Collection<? extends GrantedAuthority> getAuthorities() {
+      
+      //user.getRole(); 의 리턴타입은 String이기 때문에 바로 리턴을 할 수 없다
+      
+      Collection<GrantedAuthority> collect = new ArrayList<>();
+      collect.add(new GrantedAuthority() {
 
-        Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-        authorities.add(new SimpleGrantedAuthority(user.getRole()));
-        return authorities;
-    }
+         @Override
+         public String getAuthority() {
+            return user.getRole();
+         }
+         
+      });
+      return collect;
+   }
+   */
 
-    @Override
-    public String getPassword() {
-        return user.getPassword();
-    }
+   //SimpleGrantedAuthority을 활용한 최신 버전의 getAuthorities
+   @Override
+   public Collection<? extends GrantedAuthority> getAuthorities() {
+      return List.of(new SimpleGrantedAuthority(user.getRole()));
+   }
 
-    @Override
-    public String getUsername() {
-        return user.getUsername();
-    }
+   @Override
+   public String getPassword() {
+      return user.getPassword();
+   }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        //우리 사이트 1년 동안 회원이 로그인을 안하면 휴면 계정으로 하기로 함
-        //현재시간 - 로긴시간 => 1년을 초과하면 return false;
-        return true;
-    }
+   @Override
+   public String getUsername() {
+      return user.getUsername();
+   }
 }

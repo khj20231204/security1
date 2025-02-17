@@ -1,13 +1,14 @@
 package com.cos.security1.model;
 
+import java.sql.Timestamp;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Data;
-import org.hibernate.annotations.CreationTimestamp;
-
-import java.sql.Timestamp;
 
 @Data
 @Entity
@@ -24,4 +25,31 @@ public class User {
     @CreationTimestamp
     private Timestamp createDate;
 
+    
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    } 
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+    
+
+    
 }
